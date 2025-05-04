@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>SpottR - Car Marketplace</title>
+    <title>SpottR - Marketplace</title>
     <meta name="theme-color" content="black">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
@@ -27,10 +27,10 @@
 
         .header {
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
             padding: 15px;
-            background-color: #1a1a1a;
+            background-color: black;
             position: sticky;
             top: 0;
             z-index: 100;
@@ -40,51 +40,7 @@
         .logo {
             font-weight: bold;
             font-size: 20px;
-            color: #e51a22;
-        }
-
-        .header-icons {
-            display: flex;
-            gap: 20px;
-            font-size: 20px;
-        }
-
-        .marketplace-header {
-            padding: 15px;
-            background-color: #1a1a1a;
-            border-bottom: 1px solid #2a2a2a;
-        }
-
-        .marketplace-title {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .marketplace-subtitle {
-            color: #888;
-            font-size: 14px;
-        }
-
-        .search-bar {
-            display: flex;
-            padding: 10px 15px;
-            background-color: #1a1a1a;
-            border-bottom: 1px solid #2a2a2a;
-        }
-
-        .search-input {
-            flex: 1;
-            background-color: #2a2a2a;
-            border: none;
-            border-radius: 20px;
-            padding: 10px 15px;
             color: white;
-            font-size: 14px;
-        }
-
-        .search-input::placeholder {
-            color: #888;
         }
 
         .filter-tabs {
@@ -113,7 +69,7 @@
 
         .listings-container {
             padding: 10px;
-            height: calc(100vh - 265px);
+            height: calc(100vh - 185px);
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
         }
@@ -246,36 +202,11 @@
                 padding-bottom: max(10px, env(safe-area-inset-bottom));
             }
         }
-
-        /* Loading skeleton */
-        .skeleton {
-            background-color: #2a2a2a;
-            border-radius: 4px;
-            animation: pulse 1.5s infinite ease-in-out;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 0.6; }
-            50% { opacity: 0.3; }
-        }
     </style>
 </head>
 <body>
     <div class="header">
-        <div class="logo">SpottR</div>
-        <div class="header-icons">
-            <i class="fas fa-search"></i>
-            <i class="fas fa-bell"></i>
-        </div>
-    </div>
-
-    <div class="marketplace-header">
-        <div class="marketplace-title">Car Marketplace</div>
-        <div class="marketplace-subtitle">Buy and sell cars in your community</div>
-    </div>
-
-    <div class="search-bar">
-        <input type="text" class="search-input" placeholder="Search for cars...">
+        <div class="logo">SpottR Marketplace</div>
     </div>
 
     <div class="filter-tabs">
@@ -286,12 +217,9 @@
         <button class="filter-tab">Luxury</button>
         <button class="filter-tab">Classic</button>
         <button class="filter-tab">Under $10K</button>
-        <button class="filter-tab">Local Deals</button>
     </div>
 
-    <div class="listings-container" id="listings">
-        <!-- Listings will be loaded here -->
-    </div>
+    <div class="listings-container" id="listings"></div>
 
     <nav class="bottom-nav">
         <a href="home.html" class="nav-item">
@@ -318,7 +246,6 @@
     </nav>
 
     <script>
-        // Sample car data
         const carListings = [
             {
                 id: 1,
@@ -402,7 +329,6 @@
             }
         ];
 
-        // Render listings
         const listingsContainer = document.getElementById('listings');
         
         function renderListings(listings) {
@@ -432,7 +358,6 @@
                 `;
                 
                 listing.addEventListener('click', () => {
-                    // In a real app, this would open the listing detail view
                     console.log('Viewing car:', car.id);
                 });
                 
@@ -440,41 +365,16 @@
             });
         }
 
-        // Filter functionality
         document.querySelectorAll('.filter-tab').forEach(tab => {
             tab.addEventListener('click', function() {
                 document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
                 this.classList.add('active');
-                
-                // In a real app, you would filter the listings based on the selected tab
-                const filter = this.textContent;
-                console.log('Filtering by:', filter);
-                
-                // For demo purposes, we'll just shuffle the listings
                 renderListings([...carListings].sort(() => 0.5 - Math.random()));
             });
         });
 
-        // Search functionality
-        const searchInput = document.querySelector('.search-input');
-        searchInput.addEventListener('input', function() {
-            const searchTerm = this.value.toLowerCase();
-            
-            if (searchTerm.length > 2) {
-                const filtered = carListings.filter(car => 
-                    car.title.toLowerCase().includes(searchTerm) ||
-                    car.year.includes(searchTerm)
-                );
-                renderListings(filtered);
-            } else {
-                renderListings(carListings);
-            }
-        });
-
-        // Initial render
         renderListings(carListings);
 
-        // Simulate loading
         setTimeout(() => {
             document.getElementById('listings').style.opacity = '1';
         }, 300);

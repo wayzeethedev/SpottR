@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>SpottR - Meets</title>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="black">
+    <link rel="stylesheet" href="/assets/css/global.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            background-color: black;
+            color: white;
+            overflow: hidden;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #222;
+        }
+
+        .logo {
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        .header-icons {
+            display: flex;
+            gap: 20px;
+            font-size: 20px;
+        }
+
+        #map {
+            width: 100%;
+            height: calc(100vh - 120px);
+            background-color: #222;
+        }
+
+        .map-controls {
+            position: fixed;
+            top: 70px;
+            right: 15px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .map-control-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 20px;
+            background-color: #111;
+            color: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+
+        .meet-card {
+            position: fixed;
+            bottom: 85px;
+            left: 0;
+            right: 0;
+            margin: 0 auto;
+            width: 90%;
+            max-width: 400px;
+            background-color: #111;
+            border-radius: 15px;
+            padding: 15px;
+            z-index: 1000;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            display: none;
+        }
+
+        .meet-title {
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .meet-location {
+            color: #ccc;
+            font-size: 14px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .meet-time {
+            color: #e51a22;
+            font-size: 14px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .meet-attendees {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .attendee-count {
+            font-size: 12px;
+            color: #888;
+            margin-left: 10px;
+        }
+
+        .meet-actions {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .meet-action-btn {
+            background-color: #222;
+            border: none;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-weight: bold;
+            flex: 1;
+            max-width: 48%;
+        }
+
+        .meet-action-btn.primary {
+            background-color: #e51a22;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 85px;
+            background-color: #111;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            padding: 10px 20px;
+            border-top: 1px solid #333;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ccc;
+            text-decoration: none;
+            height: 100%;
+            flex: 1;
+            max-width: 60px;
+        }
+
+        .nav-item i {
+            font-size: 24px;
+        }
+
+        .nav-item.active {
+            color: #e51a22;
+        }
+
+        .plus-icon {
+            background-color: #e51a22;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(229, 26, 34, 0.3);
+            margin: 0 auto;
+        }
+
+        .plus-icon i {
+            color: white;
+            font-size: 18px;
+        }
+
+        .fa-spinner {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @supports(padding: max(0px)) {
+            .bottom-nav {
+                padding-bottom: max(10px, env(safe-area-inset-bottom));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">SpottR</div>
+        <div class="header-icons">
+            <i class="fas fa-search"></i>
+            <i class="fas fa-filter"></i>
+        </div>
+    </div>
+
+    <div id="map"></div>
+    
+    <div class="map-controls">
+        <button class="map-control-btn" id="locateMe">
+            <i class="fas fa-location-arrow"></i>
+        </button>
+        <button class="map-control-btn" id="zoomIn">
+            <i class="fas fa-plus"></i>
+        </button>
+        <button class="map-control-btn" id="zoomOut">
+            <i class="fas fa-minus"></i>
+        </button>
+    </div>
+    
+    <div class="meet-card" id="meetCard">
+        <div class="meet-title" id="meetTitle">Event Title</div>
+        <div class="meet-location">
+            <i class="fas fa-map-marker-alt"></i>
+            <span id="meetLocation">Location</span>
+        </div>
+        <div class="meet-time">
+            <i class="far fa-clock"></i>
+            <span id="meetTime">Time</span>
+        </div>
+        <div class="meet-attendees">
+            <div class="attendee-avatars" id="attendeeAvatars"></div>
+            <div class="attendee-count" id="attendeeCount">+0 attending</div>
+        </div>
+        <div class="meet-actions">
+            <button class="meet-action-btn primary">I'm Going</button>
+            <button class="meet-action-btn">Details</button>
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <a href="home.html" class="nav-item">
+            <i class="fas fa-home"></i>
+        </a>
+        <a href="meets.html" class="nav-item active">
+            <i class="fas fa-map-pin"></i>
+        </a>
+        <a href="create.html" class="nav-item">
+            <div class="plus-icon">
+                <i class="fas fa-plus"></i>
+            </div>
+        </a>
+        <a href="marketplace.html" class="nav-item">
+            <i class="fas fa-store"></i>
+        </a>
+        <a href="profile.html" class="nav-item">
+            <i class="fas fa-user"></i>
+        </a>
+    </nav>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        let map;
+        let userMarker;
+        let eventMarkers = [];
+        let currentEventCard = null;
+        const defaultLocation = [51.505, -0.09];
+        let zoomLevel = 13;
+        let watchId = null;
+
+        const events = [
+            {
+                id: 1,
+                title: "Weekly Cars & Coffee",
+                location: "Downtown Parking Garage, 123 Main St",
+                time: "Sat, Jun 10 · 8:00 AM",
+                position: [51.51, -0.1],
+                attendees: 124,
+                attendeeAvatars: [
+                    "https://randomuser.me/api/portraits/men/32.jpg",
+                    "https://randomuser.me/api/portraits/women/44.jpg",
+                    "https://randomuser.me/api/portraits/men/22.jpg",
+                    "https://randomuser.me/api/portraits/men/67.jpg"
+                ]
+            },
+            {
+                id: 2,
+                title: "Night Drift Meet",
+                location: "Industrial Zone, 456 Side St",
+                time: "Fri, Jun 9 · 10:00 PM",
+                position: [51.515, -0.08],
+                attendees: 87,
+                attendeeAvatars: [
+                    "https://randomuser.me/api/portraits/women/33.jpg",
+                    "https://randomuser.me/api/portraits/men/45.jpg",
+                    "https://randomuser.me/api/portraits/women/28.jpg"
+                ]
+            },
+            {
+                id: 3,
+                title: "Classic Car Show",
+                location: "City Park, Central Avenue",
+                time: "Sun, Jun 11 · 11:00 AM",
+                position: [51.50, -0.095],
+                attendees: 215,
+                attendeeAvatars: [
+                    "https://randomuser.me/api/portraits/men/55.jpg",
+                    "https://randomuser.me/api/portraits/women/62.jpg",
+                    "https://randomuser.me/api/portraits/men/71.jpg",
+                    "https://randomuser.me/api/portraits/women/39.jpg"
+                ]
+            }
+        ];
+
+        function initMap() {
+            map = L.map('map').setView([0, 0], zoomLevel);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+
+            addEventMarkers();
+            locateUser(false);
+        }
+
+        function addEventMarkers() {
+            events.forEach(event => {
+                const marker = L.marker(event.position, {
+                    icon: L.divIcon({
+                        className: 'event-marker',
+                        html: '<i class="fas fa-map-marker" style="color: #e51a22; font-size: 30px;"></i>',
+                        iconSize: [30, 30],
+                        iconAnchor: [15, 30]
+                    })
+                }).addTo(map);
+
+                marker.on('click', () => showEventCard(event));
+                eventMarkers.push(marker);
+            });
+        }
+
+        function showEventCard(event) {
+            document.getElementById('meetTitle').textContent = event.title;
+            document.getElementById('meetLocation').textContent = event.location;
+            document.getElementById('meetTime').textContent = event.time;
+            document.getElementById('attendeeCount').textContent = `+${event.attendees} attending`;
+            
+            const avatarsContainer = document.getElementById('attendeeAvatars');
+            avatarsContainer.innerHTML = '';
+            
+            event.attendeeAvatars.forEach(avatar => {
+                avatarsContainer.innerHTML += `
+                    <img src="${avatar}" width="30" height="30" style="border-radius: 15px; border: 2px solid #111; margin-right: -10px;">
+                `;
+            });
+
+            document.getElementById('meetCard').style.display = 'block';
+            currentEventCard = event.id;
+            map.setView(event.position, zoomLevel);
+        }
+
+        function locateUser(showError = true) {
+            if (navigator.geolocation) {
+                const locateBtn = document.getElementById('locateMe');
+                locateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                
+                navigator.geolocation.getCurrentPosition(
+                    position => {
+                        locateBtn.innerHTML = '<i class="fas fa-location-arrow"></i>';
+                        const userLocation = [position.coords.latitude, position.coords.longitude];
+                        
+                        if (userMarker) {
+                            userMarker.setLatLng(userLocation);
+                        } else {
+                            userMarker = L.marker(userLocation, {
+                                icon: L.divIcon({
+                                    className: 'user-location-marker',
+                                    html: '<i class="fas fa-circle" style="color: #4CAF50; font-size: 20px;"></i>',
+                                    iconSize: [20, 20],
+                                    iconAnchor: [10, 10]
+                                })
+                            }).addTo(map);
+                        }
+                        
+                        map.setView(userLocation, zoomLevel);
+                        
+                        if (watchId) navigator.geolocation.clearWatch(watchId);
+                        watchId = navigator.geolocation.watchPosition(
+                            updatePosition,
+                            handleLocationError,
+                            { enableHighAccuracy: true, maximumAge: 10000, timeout: 5000 }
+                        );
+                    },
+                    error => {
+                        locateBtn.innerHTML = '<i class="fas fa-location-arrow"></i>';
+                        if (showError) {
+                            handleLocationError(error);
+                        }
+                        if (!userMarker) {
+                            map.setView(defaultLocation, zoomLevel);
+                        }
+                    },
+                    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+                );
+            } else {
+                if (showError) {
+                    alert("Geolocation is not supported by your browser");
+                }
+                map.setView(defaultLocation, zoomLevel);
+            }
+        }
+
+        function updatePosition(position) {
+            const userLocation = [position.coords.latitude, position.coords.longitude];
+            if (userMarker) {
+                userMarker.setLatLng(userLocation);
+            }
+        }
+
+        function handleLocationError(error) {
+            let message;
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    message = "Location access was denied. Please enable location services in your browser settings.";
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    message = "Location information is unavailable.";
+                    break;
+                case error.TIMEOUT:
+                    message = "The request to get user location timed out.";
+                    break;
+                case error.UNKNOWN_ERROR:
+                    message = "An unknown error occurred.";
+                    break;
+            }
+            alert(message);
+        }
+
+        document.getElementById('locateMe').addEventListener('click', () => {
+            locateUser(true);
+        });
+        document.getElementById('zoomIn').addEventListener('click', () => {
+            zoomLevel = Math.min(zoomLevel + 1, 18);
+            map.setZoom(zoomLevel);
+        });
+        document.getElementById('zoomOut').addEventListener('click', () => {
+            zoomLevel = Math.max(zoomLevel - 1, 1);
+            map.setZoom(zoomLevel);
+        });
+
+        document.addEventListener('DOMContentLoaded', initMap);
+    </script>
+</body>
+</html>

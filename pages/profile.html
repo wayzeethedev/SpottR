@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>SpottR - Profile</title>
+    <meta name="theme-color" content="black" />
+    <link rel="stylesheet" href="/assets/css/global.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            background-color: black;
+            color: white;
+            overflow: hidden;
+        }
+
+        .content {
+            height: calc(100% - env(safe-area-inset-bottom) - 85px);
+            overflow-y: auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #222;
+        }
+
+        .header-title {
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .header-icons {
+            display: flex;
+            gap: 20px;
+            font-size: 20px;
+        }
+
+        .profile-section {
+            padding: 20px 15px;
+        }
+
+        .profile-top {
+            display: flex;
+            margin-bottom: 20px;
+        }
+
+        .profile-pic {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin-right: 20px;
+            position: relative;
+        }
+
+        .profile-pic img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #333;
+        }
+
+        .profile-stats {
+            flex: 1;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stat-count {
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 3px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .profile-info {
+            margin-bottom: 15px;
+        }
+
+        .profile-name {
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .profile-bio {
+            font-size: 14px;
+            line-height: 1.4;
+            margin-bottom: 10px;
+        }
+
+        .profile-link {
+            color: #0095f6;
+            font-size: 14px;
+            text-decoration: none;
+        }
+
+        .profile-actions {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 8px 0;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .edit-btn {
+            background-color: #333;
+            color: white;
+            border: none;
+        }
+
+        .share-btn {
+            background-color: transparent;
+            color: white;
+            border: 1px solid #444;
+        }
+
+        .highlight-stories {
+            display: flex;
+            padding: 10px 0;
+            margin-bottom: 15px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .highlight-stories::-webkit-scrollbar {
+            display: none;
+        }
+
+        .highlight {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .highlight-circle {
+            width: 70px;
+            height: 70px;
+            border-radius: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 5px;
+            background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+            padding: 2px;
+        }
+
+        .highlight-inner {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background-color: #111;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .highlight-inner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .highlight-name {
+            font-size: 12px;
+            max-width: 70px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .new-highlight {
+            background: transparent;
+            border: 1px solid #444;
+        }
+
+        .new-highlight .highlight-inner {
+            background: transparent;
+        }
+
+        .new-highlight i {
+            font-size: 24px;
+            color: white;
+        }
+
+        .profile-tabs {
+            display: flex;
+            border-top: 1px solid #222;
+        }
+
+        .profile-tab {
+            flex: 1;
+            text-align: center;
+            padding: 15px 0;
+            font-size: 14px;
+            color: #888;
+            position: relative;
+        }
+
+        .profile-tab.active {
+            color: white;
+        }
+
+        .profile-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50%;
+            height: 2px;
+            background-color: white;
+        }
+
+        .posts-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2px;
+        }
+
+        .post-thumbnail {
+            aspect-ratio: 1/1;
+            background-color: #222;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .post-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .post-thumbnail-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .post-thumbnail:hover .post-thumbnail-overlay {
+            opacity: 1;
+        }
+
+        .post-thumbnail-overlay span {
+            margin: 0 5px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Image Preview Modal */
+        .image-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.9);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .image-modal img {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: white;
+            font-size: 30px;
+            background: none;
+            border: none;
+        }
+
+        /* Bottom Nav */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 85px;
+            background-color: #111;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+            padding: 10px 20px;
+            border-top: 1px solid #333;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ccc;
+            text-decoration: none;
+            height: 100%;
+            position: relative;
+            transition: all 0.2s ease;
+            flex: 1;
+            max-width: 60px;
+        }
+
+        .nav-item i {
+            font-size: 24px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-item.active {
+            color: #e51a22;
+        }
+
+        .nav-item.active i {
+            transform: translateY(-3px);
+        }
+
+        .plus-icon {
+            background-color: #e51a22;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(229, 26, 34, 0.3);
+            transition: all 0.2s ease;
+            margin: 0 auto;
+        }
+
+        .plus-icon i {
+            color: white;
+            font-size: 18px;
+        }
+
+        .plus-icon:hover {
+            transform: scale(1.05);
+        }
+
+        @supports(padding: max(0px)) {
+            .bottom-nav {
+                padding-bottom: max(10px, env(safe-area-inset-bottom));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-title">username123</div>
+        <div class="header-icons">
+            <i class="fas fa-plus-square"></i>
+            <i class="fas fa-bars"></i>
+        </div>
+    </div>
+
+    <div class="content">
+        <div class="profile-section">
+            <div class="profile-top">
+                <div class="profile-pic">
+                    <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Profile" class="profile-image">
+                </div>
+                <div class="profile-stats">
+                    <div class="stat">
+                        <div class="stat-count">142</div>
+                        <div class="stat-label">Posts</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-count">3.2K</div>
+                        <div class="stat-label">Followers</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-count">487</div>
+                        <div class="stat-label">Following</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="profile-info">
+                <div class="profile-name">John Doe</div>
+                <div class="profile-bio">
+                    Car enthusiast | Photographer | Traveler
+                    Living life one mile at a time 🚗💨
+                </div>
+                <a href="#" class="profile-link">www.johndoe.com</a>
+            </div>
+
+            <div class="profile-actions">
+                <button class="action-btn edit-btn">Edit Profile</button>
+                <button class="action-btn share-btn">Share Profile</button>
+            </div>
+
+            <div class="highlight-stories">
+                <div class="highlight">
+                    <div class="highlight-circle">
+                        <div class="highlight-inner">
+                            <img src="https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80" alt="Highlight">
+                        </div>
+                    </div>
+                    <div class="highlight-name">Cars</div>
+                </div>
+                <div class="highlight">
+                    <div class="highlight-circle">
+                        <div class="highlight-inner">
+                            <img src="https://images.unsplash.com/photo-1504215680853-026ed2a45def?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80" alt="Highlight">
+                        </div>
+                    </div>
+                    <div class="highlight-name">Travel</div>
+                </div>
+                <div class="highlight">
+                    <div class="highlight-circle">
+                        <div class="highlight-inner">
+                            <img src="https://images.unsplash.com/photo-1580273916550-e323be2ae537?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80" alt="Highlight">
+                        </div>
+                    </div>
+                    <div class="highlight-name">Meets</div>
+                </div>
+                <div class="highlight new-highlight">
+                    <div class="highlight-circle">
+                        <div class="highlight-inner">
+                            <i class="fas fa-plus"></i>
+                        </div>
+                    </div>
+                    <div class="highlight-name">New</div>
+                </div>
+            </div>
+
+            <div class="profile-tabs">
+                <div class="profile-tab active" data-tab="posts">
+                    <i class="fas fa-th"></i>
+                </div>
+                <div class="profile-tab" data-tab="tagged">
+                    <i class="fas fa-user-tag"></i>
+                </div>
+            </div>
+
+            <div class="tab-content active" id="posts-tab">
+                <div class="posts-grid">
+                    <div class="post-thumbnail">
+                        <img src="https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Post" class="enlargeable-image">
+                        <div class="post-thumbnail-overlay">
+                            <span><i class="fas fa-heart"></i> 1.2K</span>
+                            <span><i class="fas fa-comment"></i> 84</span>
+                        </div>
+                    </div>
+                    <div class="post-thumbnail">
+                        <img src="https://images.unsplash.com/photo-1504215680853-026ed2a45def?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Post" class="enlargeable-image">
+                        <div class="post-thumbnail-overlay">
+                            <span><i class="fas fa-heart"></i> 2.4K</span>
+                            <span><i class="fas fa-comment"></i> 156</span>
+                        </div>
+                    </div>
+                    <div class="post-thumbnail">
+                        <img src="https://images.unsplash.com/photo-1580273916550-e323be2ae537?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Post" class="enlargeable-image">
+                        <div class="post-thumbnail-overlay">
+                            <span><i class="fas fa-heart"></i> 876</span>
+                            <span><i class="fas fa-comment"></i> 42</span>
+                        </div>
+                    </div>
+                    <div class="post-thumbnail">
+                        <img src="https://images.unsplash.com/photo-1493238792000-8113da705763?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Post" class="enlargeable-image">
+                        <div class="post-thumbnail-overlay">
+                            <span><i class="fas fa-heart"></i> 543</span>
+                            <span><i class="fas fa-comment"></i> 29</span>
+                        </div>
+                    </div>
+                    <div class="post-thumbnail">
+                        <img src="https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Post" class="enlargeable-image">
+                        <div class="post-thumbnail-overlay">
+                            <span><i class="fas fa-heart"></i> 1.5K</span>
+                            <span><i class="fas fa-comment"></i> 97</span>
+                        </div>
+                    </div>
+                    <div class="post-thumbnail">
+                        <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Post" class="enlargeable-image">
+                        <div class="post-thumbnail-overlay">
+                            <span><i class="fas fa-heart"></i> 2.1K</span>
+                            <span><i class="fas fa-comment"></i> 134</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="tagged-tab">
+                <div class="posts-grid">
+                    <div class="post-thumbnail">
+                        <img src="https://images.unsplash.com/photo-1494976388901-750342ad5436?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Tagged" class="enlargeable-image">
+                        <div class="post-thumbnail-overlay">
+                            <span><i class="fas fa-user-tag"></i></span>
+                        </div>
+                    </div>
+                    <div class="post-thumbnail">
+                        <img src="https://images.unsplash.com/photo-1502877338535-766e1452684a?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Tagged" class="enlargeable-image">
+                        <div class="post-thumbnail-overlay">
+                            <span><i class="fas fa-user-tag"></i></span>
+                        </div>
+                    </div>
+                    <div class="post-thumbnail">
+                        <img src="https://images.unsplash.com/photo-1542362567-b07e54358753?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Tagged" class="enlargeable-image">
+                        <div class="post-thumbnail-overlay">
+                            <span><i class="fas fa-user-tag"></i></span>
+                        </div>
+                    </div>
+                    <div class="post-thumbnail">
+                        <img src="https://images.unsplash.com/photo-1511919884226-fd3cad34687c?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Tagged" class="enlargeable-image">
+                        <div class="post-thumbnail-overlay">
+                            <span><i class="fas fa-user-tag"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Image Preview Modal -->
+    <div class="image-modal" id="imageModal">
+        <button class="close-modal" id="closeModal">&times;</button>
+        <img src="" alt="Preview" id="modalImage">
+    </div>
+
+    <nav class="bottom-nav">
+        <a href="/pages/home.html" class="nav-item">
+            <i class="fas fa-home"></i>
+        </a>
+        <a href="/pages/meets.html" class="nav-item">
+            <i class="fas fa-map-pin"></i>
+        </a>
+        <a href="/pages/create.html" class="nav-item">
+            <div class="plus-icon">
+                <i class="fas fa-plus"></i>
+            </div>
+        </a>
+        <a href="/pages/marketplace.html" class="nav-item">
+            <i class="fas fa-store"></i>
+        </a>
+        <a href="/pages/profile.html" class="nav-item active">
+            <i class="fas fa-user"></i>
+        </a>
+    </nav>
+
+    <script>
+        // Tab switching functionality
+        const profileTabs = document.querySelectorAll('.profile-tab');
+        profileTabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                // Remove active class from all tabs
+                profileTabs.forEach(t => t.classList.remove('active'));
+                
+                // Add active class to clicked tab
+                this.classList.add('active');
+                
+                // Hide all tab contents
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                
+                // Show the corresponding tab content
+                const tabId = this.dataset.tab + '-tab';
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+
+        // Edit profile button functionality
+        document.querySelector('.edit-btn').addEventListener('click', function() {
+            alert('Edit profile screen would open');
+        });
+
+        // Share profile button functionality
+        document.querySelector('.share-btn').addEventListener('click', function() {
+            alert('Share profile options would appear');
+        });
+
+        // New highlight functionality
+        document.querySelector('.new-highlight').addEventListener('click', function() {
+            alert('Create new highlight screen would open');
+        });
+
+        // Image preview functionality
+        const enlargeableImages = document.querySelectorAll('.enlargeable-image, .profile-image');
+        const imageModal = document.getElementById('imageModal');
+        const modalImage = document.getElementById('modalImage');
+        const closeModal = document.getElementById('closeModal');
+
+        enlargeableImages.forEach(image => {
+            image.addEventListener('click', function() {
+                modalImage.src = this.src;
+                imageModal.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            });
+        });
+
+        closeModal.addEventListener('click', function() {
+            imageModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        });
+
+        imageModal.addEventListener('click', function(e) {
+            if (e.target === imageModal) {
+                imageModal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SpottR</title>
+  <meta name="theme-color" content="black" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      background-color: black;
+      overflow: hidden;
+      color: white;
+    }
+
+    #splash {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      animation: fadeOut 1s ease-out 2s forwards;
+    }
+
+    #splash img {
+      width: 60vw;
+      height: auto;
+      animation: fadeInScale 1.5s ease-out forwards;
+      opacity: 0;
+      pointer-events: none;
+      -webkit-user-drag: none;
+    }
+
+    #content {
+      width: 100%;
+      height: 100%;
+      background-color: black;
+      display: none;
+    }
+
+    .hero-image {
+      width: 100vw;
+      height: 40vh;
+      background-image: url('https://upload.wikimedia.org/wikipedia/commons/9/9f/King_of_Europe_Round_3_Lydden_Hill_2014_%2814356011899%29.jpg');
+      background-size: cover;
+      background-position: center;
+      position: relative;
+    }
+
+    .hero-image::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: linear-gradient(to bottom, transparent, black);
+    }
+
+    .text-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 20px;
+      margin-top: -30px;
+    }
+
+    h1 {
+      font-size: 36px;
+      margin-top: 35px;
+    }
+
+    h2 {
+      font-size: 18px;
+      margin-top: 10px;
+      max-width: 85vw;
+      margin-bottom: 30px;
+      color: #ccc;
+    }
+
+    .buttons-container {
+      position: fixed;
+      bottom: 40px;
+      width: 85vw;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .button {
+      width: 100%;
+      height: 60px;
+      border-radius: 15px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-weight: bold;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    .login-button {
+      background-color: #e51a22;
+      color: white;
+    }
+
+    .signup-button {
+      background-color: transparent;
+      border: 2px solid white;
+      color: white;
+    }
+
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.9);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+    }
+
+    .form-container {
+      width: 85%;
+      max-width: 400px;
+      background-color: #111;
+      border-radius: 15px;
+      padding: 25px;
+      box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
+    }
+
+    .form-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+    }
+
+    .form-title {
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .close-button {
+      font-size: 24px;
+      cursor: pointer;
+      color: #ccc;
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+    }
+
+    .input-label {
+      display: block;
+      margin-bottom: 8px;
+      color: #ccc;
+      font-size: 14px;
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 12px 15px;
+      background-color: #222;
+      border: 1px solid #333;
+      border-radius: 8px;
+      color: white;
+      font-size: 16px;
+    }
+
+    .submit-button {
+      width: 100%;
+      padding: 15px;
+      background-color: #e51a22;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    .form-footer {
+      margin-top: 20px;
+      text-align: center;
+      color: #ccc;
+      font-size: 14px;
+    }
+
+    .form-footer a {
+      color: #e51a22;
+      text-decoration: none;
+    }
+
+    @keyframes fadeInScale {
+      0% {
+        opacity: 0;
+        transform: scale(0.9);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    @keyframes fadeOut {
+      to {
+        opacity: 0;
+        visibility: hidden;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="splash">
+    <img src="/assets/images/nbicon.png" alt="SpottR Logo" draggable="false" />
+  </div>
+  
+  <div id="content">
+    <div class="hero-image"></div>
+    <div class="text-container">
+      <h1>Welcome to Spott<span>R</span></h1>
+      <h2>Select an action to connect to your local car community.</h2>
+    </div>
+    <div class="buttons-container">
+      <div class="button login-button" id="loginButton">LOG IN</div>
+      <div class="button signup-button" id="signupButton">SIGN UP</div>
+    </div>
+
+    <div class="overlay" id="loginOverlay">
+      <div class="form-container">
+        <div class="form-header">
+          <div class="form-title">Log In</div>
+          <div class="close-button" id="closeLogin">&times;</div>
+        </div>
+        <form id="loginForm">
+          <div class="input-group">
+            <label class="input-label">Email</label>
+            <input type="email" class="input-field" placeholder="Enter your email" required>
+          </div>
+          <div class="input-group">
+            <label class="input-label">Password</label>
+            <input type="password" class="input-field" placeholder="Enter your password" required>
+          </div>
+          <button type="submit" class="submit-button">LOG IN</button>
+        </form>
+        <div class="form-footer">
+          Don't have an account? <a href="#" id="switchToSignup">Sign up</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="overlay" id="signupOverlay">
+      <div class="form-container">
+        <div class="form-header">
+          <div class="form-title">Sign Up</div>
+          <div class="close-button" id="closeSignup">&times;</div>
+        </div>
+        <form id="signupForm">
+          <div class="input-group">
+            <label class="input-label">Username</label>
+            <input type="text" class="input-field" placeholder="Choose a username" required>
+          </div>
+          <div class="input-group">
+            <label class="input-label">Email</label>
+            <input type="email" class="input-field" placeholder="Enter your email" required>
+          </div>
+          <div class="input-group">
+            <label class="input-label">Password</label>
+            <input type="password" class="input-field" placeholder="Create a password" required>
+          </div>
+          <div class="input-group">
+            <label class="input-label">Confirm Password</label>
+            <input type="password" class="input-field" placeholder="Confirm your password" required>
+          </div>
+          <button type="submit" class="submit-button">SIGN UP</button>
+        </form>
+        <div class="form-footer">
+          Already have an account? <a href="#" id="switchToLogin">Log in</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener("contextmenu", e => e.preventDefault());
+    document.addEventListener("copy", e => e.preventDefault());
+    document.addEventListener("cut", e => e.preventDefault());
+    document.addEventListener("selectstart", e => e.preventDefault());
+    document.addEventListener("touchstart", function(e) {
+      if (e.touches.length > 1) e.preventDefault();
+    }, { passive: false });
+
+    window.addEventListener("load", () => {
+      setTimeout(() => {
+        document.getElementById("splash").style.display = "none";
+        document.getElementById("content").style.display = "block";
+      }, 3000);
+    });
+
+    const loginButton = document.getElementById('loginButton');
+    const signupButton = document.getElementById('signupButton');
+    const loginOverlay = document.getElementById('loginOverlay');
+    const signupOverlay = document.getElementById('signupOverlay');
+    const closeLogin = document.getElementById('closeLogin');
+    const closeSignup = document.getElementById('closeSignup');
+    const switchToSignup = document.getElementById('switchToSignup');
+    const switchToLogin = document.getElementById('switchToLogin');
+    const loginForm = document.getElementById('loginForm');
+    const signupForm = document.getElementById('signupForm');
+
+    loginButton.addEventListener('click', () => {
+      loginOverlay.style.display = 'flex';
+    });
+
+    signupButton.addEventListener('click', () => {
+      signupOverlay.style.display = 'flex';
+    });
+
+    closeLogin.addEventListener('click', () => {
+      loginOverlay.style.display = 'none';
+    });
+
+    closeSignup.addEventListener('click', () => {
+      signupOverlay.style.display = 'none';
+    });
+
+    switchToSignup.addEventListener('click', (e) => {
+      e.preventDefault();
+      loginOverlay.style.display = 'none';
+      signupOverlay.style.display = 'flex';
+    });
+
+    switchToLogin.addEventListener('click', (e) => {
+      e.preventDefault();
+      signupOverlay.style.display = 'none';
+      loginOverlay.style.display = 'flex';
+    });
+
+    loginForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      alert('Login functionality would be implemented here');
+      loginOverlay.style.display = 'none';
+    });
+
+    signupForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      alert('Signup functionality would be implemented here');
+      signupOverlay.style.display = 'none';
+    });
+
+    document.addEventListener('click', (e) => {
+      if (e.target === loginOverlay) {
+        loginOverlay.style.display = 'none';
+      }
+      if (e.target === signupOverlay) {
+        signupOverlay.style.display = 'none';
+      }
+    });
+  </script>
+</body>
+</html>

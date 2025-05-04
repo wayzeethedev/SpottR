@@ -1,0 +1,24 @@
+{
+  "short_name": "SpottR",
+  "name": "SpottR",
+  "description": "Find and share car meets around you with SpottR.",
+  "icons": [
+    {
+      "src": "/assets/images/icondark.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/assets/images/icondark.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#000000",
+  "theme_color": "#e51a22",
+  "id": "/"
+}
